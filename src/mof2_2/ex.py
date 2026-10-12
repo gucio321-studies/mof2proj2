@@ -23,10 +23,11 @@ def ex3(nu=0):
     alpha= .999 * base.m * base.dx**2
     print("Ex3: solving psi1")
     psi1 = ex(alpha=alpha, N=300, nu=nu)
-    print(psi1.solve())
+    print(psi1.solve()["delta"])
     print("Ex3: solving psi2")
     psi2 = ex(alpha=alpha, N=300, nu=nu)
-    print(psi2.solve(psis=[psi1]))
+    result = psi2.solve(psis=[psi1])
+    print(result["delta"])
 
     fig, ax = plt.subplots()
     ax.plot(psi1.x, psi1.psi, label="$\\Psi_1$")
@@ -37,6 +38,16 @@ def ex3(nu=0):
     ax.grid()
 
     fig.savefig(f"ex3_nu_{nu}.svg", format='svg')
+    plt.close(fig)
+
+    fig, ax = plt.subplots()
+    ax.plot(result['history'])
+    ax.grid()
+    ax.set_yscale('log')
+    ax.set_xlabel("iteracja")
+    ax.set_ylabel("$\\Delta$ E [a.u.]")
+    
+    fig.savefig(f"ex3_zbierznosc_nu_{nu}.svg", format='svg')
     plt.close(fig)
 
 
@@ -110,6 +121,7 @@ class ex:
         """
         tolerance_au = self.meV_to_au(tolerance)
         oldE = 0
+        Es = []
         while True:
             self.iterate_psi()
 
@@ -121,8 +133,10 @@ class ex:
             newE = self.Energy()
             delta = abs(newE - oldE)
             oldE = newE
+            Es.append(abs(delta))
             if delta < tolerance_au:
                 return {
                     "energy": oldE,
                     "delta": delta,
+                    "history": Es,
                 }
