@@ -18,14 +18,14 @@ def ex2():
         print("---")
         print(new_base.solve())
 
-def ex3():
-    base = ex(alpha=1, N=300)
+def ex3(nu=0):
+    base = ex(alpha=1, N=300, nu=nu)
     alpha= .999 * base.m * base.dx**2
     print("Ex3: solving psi1")
-    psi1 = ex(alpha=alpha, N=300)
+    psi1 = ex(alpha=alpha, N=300, nu=nu)
     print(psi1.solve())
     print("Ex3: solving psi2")
-    psi2 = ex(alpha=alpha, N=300)
+    psi2 = ex(alpha=alpha, N=300, nu=nu)
     print(psi2.solve2(psi1))
 
     fig, ax = plt.subplots()
@@ -36,7 +36,7 @@ def ex3():
     ax.legend()
     ax.grid()
 
-    fig.savefig("ex3.svg", format='svg')
+    fig.savefig(f"ex3_nu_{nu}.svg", format='svg')
     plt.close(fig)
 
 
