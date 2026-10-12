@@ -11,16 +11,19 @@ def ex2():
         0.8 * alpha_max,
         0.95 * alpha_max,
         0.999 * alpha_max,
-        alpha_max,
+        1.001*alpha_max,
     ]
     for alpha in alphas:
         new_base = ex(alpha=alpha, N=300)
-        print("---")
-        print(new_base.solve())
+        result = new_base.solve()
+        print(
+            f"Ex2: alpha: {alpha}; Energy: {result['energy']}; delta: {result['delta']}"
+        )
+
 
 def ex3(nu=0):
     base = ex(alpha=1, N=300, nu=nu)
-    alpha= .999 * base.m * base.dx**2
+    alpha = 0.999 * base.m * base.dx**2
     print("Ex3: solving psi1")
     psi1 = ex(alpha=alpha, N=300, nu=nu)
     print(psi1.solve()["delta"])
@@ -37,17 +40,17 @@ def ex3(nu=0):
     ax.legend()
     ax.grid()
 
-    fig.savefig(f"ex3_nu_{nu}.svg", format='svg')
+    fig.savefig(f"ex3_nu_{nu}.svg", format="svg")
     plt.close(fig)
 
     fig, ax = plt.subplots()
-    ax.plot(result['history'])
+    ax.plot(result["history"])
     ax.grid()
-    ax.set_yscale('log')
+    ax.set_yscale("log")
     ax.set_xlabel("iteracja")
     ax.set_ylabel("$\\Delta$ E [a.u.]")
-    
-    fig.savefig(f"ex3_zbierznosc_nu_{nu}.svg", format='svg')
+
+    fig.savefig(f"ex3_zbierznosc_nu_{nu}.svg", format="svg")
     plt.close(fig)
 
 
