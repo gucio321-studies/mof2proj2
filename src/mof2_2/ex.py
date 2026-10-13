@@ -20,7 +20,7 @@ def ex2():
         print(
             f"Ex2: alpha: {alpha}; Energy: {result['energy']}; delta: {result['delta']}; Number of iterations: {result['iterations']}"
         )
-        iters.append(result['iterations'])
+        iters.append(result["iterations"])
 
     fig, ax = plt.subplots()
 
@@ -28,7 +28,7 @@ def ex2():
     ax.set_xlabel("$\\alpha$ [$\\% \\alpha_{max}$]")
     ax.set_ylabel("Liczba iteracji")
 
-    fig.savefig('ex2_alpha.svg', format='svg')
+    fig.savefig("ex2_alpha.svg", format="svg")
     plt.close(fig)
 
 
@@ -38,12 +38,16 @@ def ex3(nu=0):
     print("Ex4: solving psi1")
     psi1 = ex(alpha=alpha, N=300, nu=nu)
     result = psi1.solve()
-    print(f"Ex4: Energy 1: {result['energy']}; delta: {result["delta"]}; Number of iterations: {result['iterations']}")
+    print(
+        f"Ex4: Energy 1: {result['energy']}; delta: {result["delta"]}; Number of iterations: {result['iterations']}"
+    )
 
     print("Ex4: solving psi2")
     psi2 = ex(alpha=alpha, N=300, nu=nu)
     result = psi2.solve(psis=[psi1])
-    print(f"Ex4: Energy 2: {result['energy']}; delta: {result["delta"]}; Number of iterations: {result['iterations']}")
+    print(
+        f"Ex4: Energy 2: {result['energy']}; delta: {result["delta"]}; Number of iterations: {result['iterations']}"
+    )
 
     fig, ax = plt.subplots()
     ax.plot(psi1.x, psi1.psi, label="$\\Psi_1$")
@@ -64,6 +68,33 @@ def ex3(nu=0):
     ax.set_ylabel("$\\Delta$ E [a.u.]")
 
     fig.savefig(f"ex3_zbierznosc_nu_{nu}.svg", format="svg")
+    plt.close(fig)
+
+
+def more_En(N=7):
+    psis = []
+    Es = []
+    base = ex(alpha=1, N=300)
+    alpha = 0.999 * base.m * base.dx**2
+    for i in range(N):
+        new_psi = ex(alpha=alpha, N=300)
+        result = new_psi.solve(tolerance=1e-9, psis=psis)
+        print(
+            f"Ex*: Calculated Energy level {i} with Energy={result['energy']}, Number of iterations={result['iterations']}"
+        )
+        psis.append(new_psi)
+        Es.append(result['energy'])
+
+    fig, ax = plt.subplots()
+    for i in range(N):
+        ax.plot(psis[i].x, psis[i].psi, label=f"$\\Psi_{i}$")
+    
+    ax.legend()
+    ax.set_xlabel("Położenie [a.u.]")
+    ax.set_ylabel("$\\Psi$")
+    ax.grid()
+
+    fig.savefig("exX_psis.svg", format='svg')
     plt.close(fig)
 
 
