@@ -13,12 +13,23 @@ def ex2():
         0.999 * alpha_max,
         1.001 * alpha_max,
     ]
+    iters = []
     for alpha in alphas:
         new_base = ex(alpha=alpha, N=300)
         result = new_base.solve()
         print(
             f"Ex2: alpha: {alpha}; Energy: {result['energy']}; delta: {result['delta']}; Number of iterations: {result['iterations']}"
         )
+        iters.append(result['iterations'])
+
+    fig, ax = plt.subplots()
+
+    ax.plot(np.array(alphas) / alpha_max, iters)
+    ax.set_xlabel("$\\alpha$ [$\\% \\alpha_{max}$]")
+    ax.set_ylabel("Liczba iteracji")
+
+    fig.savefig('ex2_alpha.svg', format='svg')
+    plt.close(fig)
 
 
 def ex3(nu=0):
