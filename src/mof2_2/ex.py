@@ -11,26 +11,28 @@ def ex2():
         0.8 * alpha_max,
         0.95 * alpha_max,
         0.999 * alpha_max,
-        1.001*alpha_max,
+        1.001 * alpha_max,
     ]
     for alpha in alphas:
         new_base = ex(alpha=alpha, N=300)
         result = new_base.solve()
         print(
-            f"Ex2: alpha: {alpha}; Energy: {result['energy']}; delta: {result['delta']}"
+            f"Ex2: alpha: {alpha}; Energy: {result['energy']}; delta: {result['delta']}; Number of iterations: {result['iterations']}"
         )
 
 
 def ex3(nu=0):
     base = ex(alpha=1, N=300, nu=nu)
     alpha = 0.999 * base.m * base.dx**2
-    print("Ex3: solving psi1")
+    print("Ex4: solving psi1")
     psi1 = ex(alpha=alpha, N=300, nu=nu)
-    print(psi1.solve()["delta"])
-    print("Ex3: solving psi2")
+    result = psi1.solve()
+    print(f"Ex4: Energy 1: {result['energy']}; delta: {result["delta"]}; Number of iterations: {result['iterations']}")
+
+    print("Ex4: solving psi2")
     psi2 = ex(alpha=alpha, N=300, nu=nu)
     result = psi2.solve(psis=[psi1])
-    print(result["delta"])
+    print(f"Ex4: Energy 2: {result['energy']}; delta: {result["delta"]}; Number of iterations: {result['iterations']}")
 
     fig, ax = plt.subplots()
     ax.plot(psi1.x, psi1.psi, label="$\\Psi_1$")
@@ -124,7 +126,7 @@ class ex:
         """
         tolerance_au = self.meV_to_au(tolerance)
         oldE = 0
-        Es = []
+        deltas = []
         while True:
             self.iterate_psi()
 
@@ -136,10 +138,11 @@ class ex:
             newE = self.Energy()
             delta = abs(newE - oldE)
             oldE = newE
-            Es.append(abs(delta))
+            deltas.append(abs(delta))
             if delta < tolerance_au:
                 return {
                     "energy": oldE,
                     "delta": delta,
-                    "history": Es,
+                    "history": deltas,
+                    "iterations": len(deltas),
                 }
