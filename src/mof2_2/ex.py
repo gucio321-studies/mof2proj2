@@ -18,7 +18,7 @@ def ex2():
         new_base = ex(alpha=alpha, N=300)
         result = new_base.solve()
         print(
-            f"Ex2: alpha: {alpha}; Energy: {result['energy']}; delta: {result['delta']}; Number of iterations: {result['iterations']}"
+            f"Ex2: alpha: {alpha}; Energy: {ex.au_to_meV(result['energy'])} meV; delta: {result['delta']}; Number of iterations: {result['iterations']}"
         )
         iters.append(result["iterations"])
 
@@ -39,20 +39,20 @@ def ex3(nu=0):
     psi1 = ex(alpha=alpha, N=300, nu=nu)
     result = psi1.solve()
     print(
-        f"Ex4: Energy 1: {result['energy']}; delta: {result["delta"]}; Number of iterations: {result['iterations']}"
+        f"Ex4: Energy 1: {ex.au_to_meV(result['energy'])} meV; delta: {result["delta"]}; Number of iterations: {result['iterations']}"
     )
 
     print("Ex4: solving psi2")
     psi2 = ex(alpha=alpha, N=300, nu=nu)
     result = psi2.solve(psis=[psi1])
     print(
-        f"Ex4: Energy 2: {result['energy']}; delta: {result["delta"]}; Number of iterations: {result['iterations']}"
+        f"Ex4: Energy 2: {ex.au_to_meV(result['energy'])} meV; delta: {result["delta"]}; Number of iterations: {result['iterations']}"
     )
 
     fig, ax = plt.subplots()
-    ax.plot(psi1.x, psi1.psi, label="$\\Psi_1$")
-    ax.plot(psi2.x, psi2.psi, label="$\\Psi_2$")
-    ax.set_xlabel("Położenie [a.u.]")
+    ax.plot(psi1.x*psi1.A0, psi1.psi, label="$\\Psi_1$")
+    ax.plot(psi2.x*psi2.A0, psi2.psi, label="$\\Psi_2$")
+    ax.set_xlabel("Położenie [m]")
     ax.set_ylabel("Funkcja falowa $\\Psi$")
     ax.legend()
     ax.grid()
@@ -61,11 +61,11 @@ def ex3(nu=0):
     plt.close(fig)
 
     fig, ax = plt.subplots()
-    ax.plot(result["history"])
+    ax.plot(ex.au_to_meV(result["history"]))
     ax.grid()
     ax.set_yscale("log")
     ax.set_xlabel("iteracja")
-    ax.set_ylabel("$\\Delta$ E [a.u.]")
+    ax.set_ylabel("$\\Delta$ E [log meV]")
 
     fig.savefig(f"ex3_zbierznosc_nu_{nu}.svg", format="svg")
     plt.close(fig)
@@ -80,7 +80,7 @@ def more_En(N=7):
         new_psi = ex(alpha=alpha, N=300)
         result = new_psi.solve(tolerance=1e-9, psis=psis)
         print(
-            f"Ex*: Calculated Energy level {i} with Energy={result['energy']}, Number of iterations={result['iterations']}"
+            f"Ex*: Calculated Energy level {i} with Energy={ex.au_to_meV(result['energy'])} meV, Number of iterations={result['iterations']}"
         )
         psis.append(new_psi)
         Es.append(result['energy'])
@@ -160,6 +160,10 @@ class ex:
     def meV_to_au(meV):
         hartree_eV = const.physical_constants["Hartree energy in eV"][0]
         return meV * 1e-3 / hartree_eV
+    @staticmethod
+    def au_to_meV(au):
+        hartree_eV = const.physical_constants["Hartree energy in eV"][0]
+        return au * hartree_eV * 1e3
 
     def solve(self, tolerance=1e-6, psis=[]):
         """
@@ -185,6 +189,6 @@ class ex:
                 return {
                     "energy": oldE,
                     "delta": delta,
-                    "history": deltas,
+                    "history": np.array(deltas),
                     "iterations": len(deltas),
                 }
