@@ -14,6 +14,7 @@ def ex2():
         1.001 * alpha_max,
     ]
     iters = []
+    Es = []
     for alpha in alphas:
         new_base = ex(alpha=alpha, N=300)
         result = new_base.solve()
@@ -21,6 +22,7 @@ def ex2():
             f"Ex2: alpha: {alpha}; Energy: {ex.au_to_meV(result['energy'])} meV; delta: {result['delta']}; Number of iterations: {result['iterations']}"
         )
         iters.append(result["iterations"])
+        Es.append(result['energy'])
 
     fig, ax = plt.subplots()
 
@@ -31,22 +33,31 @@ def ex2():
     fig.savefig("ex2_alpha.svg", format="svg")
     plt.close(fig)
 
+    fig, ax = plt.subplots()
+
+    ax.plot(np.array(alphas) / alpha_max, ex.au_to_meV(np.array(Es)))
+    ax.set_xlabel("$\\alpha$ [$\\% \\alpha_{max}$]")
+    ax.set_ylabel("Energia [meV]")
+
+    fig.savefig("ex2_E.svg", format="svg")
+    plt.close(fig)
+
 
 def ex3(nu=0):
     base = ex(alpha=1, N=300, nu=nu)
     alpha = 0.999 * base.m * base.dx**2
     print("Ex4: solving psi1")
     psi1 = ex(alpha=alpha, N=300, nu=nu)
-    result = psi1.solve()
+    result1 = psi1.solve()
     print(
-        f"Ex4: Energy 1: {ex.au_to_meV(result['energy'])} meV; delta: {result["delta"]}; Number of iterations: {result['iterations']}"
+        f"Ex4: Energy 1: {ex.au_to_meV(result1['energy'])} meV; delta: {result1["delta"]}; Number of iterations: {result1['iterations']}"
     )
 
     print("Ex4: solving psi2")
     psi2 = ex(alpha=alpha, N=300, nu=nu)
-    result = psi2.solve(psis=[psi1])
+    result2 = psi2.solve(psis=[psi1])
     print(
-        f"Ex4: Energy 2: {ex.au_to_meV(result['energy'])} meV; delta: {result["delta"]}; Number of iterations: {result['iterations']}"
+        f"Ex4: Energy 2: {ex.au_to_meV(result2['energy'])} meV; delta: {result2["delta"]}; Number of iterations: {result2['iterations']}"
     )
 
     fig, ax = plt.subplots()
@@ -61,11 +72,13 @@ def ex3(nu=0):
     plt.close(fig)
 
     fig, ax = plt.subplots()
-    ax.plot(ex.au_to_meV(result["history"]))
+    ax.plot(ex.au_to_meV(result1["history"]), label="Zbierzność $E_1$")
+    ax.plot(ex.au_to_meV(result2["history"]), label="Zbierzność $E_2$")
     ax.grid()
     ax.set_yscale("log")
     ax.set_xlabel("iteracja")
     ax.set_ylabel("$\\Delta$ E [log meV]")
+    ax.legend()
 
     fig.savefig(f"ex3_zbierznosc_nu_{nu}.svg", format="svg")
     plt.close(fig)
